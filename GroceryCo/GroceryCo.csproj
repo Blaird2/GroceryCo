@@ -35,10 +35,23 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DataReader\InventoryReader.cs" />
+    <Compile Include="DataReader\ShopingBasketReader.cs" />
+    <Compile Include="Display\ReceiptDisplay.cs" />
+    <Compile Include="Display\IReceiptDisplay.cs" />
+    <Compile Include="Model\IProductInformation.cs" />
+    <Compile Include="Model\ProductInformation.cs" />
+    <Compile Include="Model\IReceiptItem.cs" />
+    <Compile Include="Model\ReceiptItem.cs" />
+    <Compile Include="Model\IInventory.cs" />
+    <Compile Include="Model\Inventory.cs" />
+    <Compile Include="Model\IReceipt.cs" />
+    <Compile Include="Model\Receipt.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Data\" />
     <Folder Include="DataReader\" />
+    <Folder Include="Display\" />
+    <Folder Include="Model\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Data\ShoppingBasket.txt" />

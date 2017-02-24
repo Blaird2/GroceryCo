@@ -4,16 +4,19 @@ using GroceryCo;
 namespace GrocerCo.Tests
 {
 	[TestFixture()]
-	public class ReceiptFixture
+	public class ReceiptItemFixture
+
 	{
+		private ProductInformation ProductInformation;
 		[Test()]
-		public void AddReceiptItem_ShouldAddToReceiptItems()
+		public void AddReceiptItem_ShouldIncrementQuantity()
 		{
 			//setup
-			var receipt = new Receipt();
+			var receiptItem = new ReceiptItem(ProductInformation );
+
 
 			//act 
-			receipt.AddReceiptItem(new ProductInformation("apple",1,1,true));
+			receiptItem(new ProductInformation("apple",1,1,true));
 
 			//assert
 			Assert.That(receipt.ReceiptItems.Count, Is.EqualTo(1));
