@@ -27,6 +27,10 @@ namespace GroceryCo
 			{
 				Console.WriteLine(a.Message);
 			}
+			 finally {
+                Console.WriteLine("Thank you for shopping at GroceryCo.  Press any key to exit");
+                Console.ReadLine();
+            }
 		}
 	}
 }
