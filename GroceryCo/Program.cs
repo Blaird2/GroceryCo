@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using GroceryCo.DataReader;
 
 namespace GroceryCo
 {
@@ -10,41 +11,42 @@ namespace GroceryCo
 
 		public static void Main(string[] args)
 		{
-			var inventory = new InventoryFactory().GetInventoryObject();
-
-			var receipt = new ReceiptFactory().GetReceiptObject();
-			var _assembly = Assembly.GetExecutingAssembly();
-
-			// Reads in inventory list which includes ItemName, RegularPrice, SalePrice and whether a two for one special is on.
-			using (var reader = new StreamReader(_assembly.GetManifestResourceStream("GroceryCo.Data.list.csv")))
+			try
 			{
-				while (!reader.EndOfStream)
+				var inventory = InventoryReader.GetInventory();
+				ReceiptPrinter receiptPrinter = new ReceiptPrinter();
+				Receipt receipt = new Receipt();
+			
+
+				//var receipt = new ReceiptFactory().GetReceiptObject();
+			
+
+				var _assembly = Assembly.GetExecutingAssembly();
+				using (var reader = new StreamReader(_assembly.GetManifestResourceStream("GroceryCo.Data.ShoppingBasket.txt")))
 				{
-					var line = reader.ReadLine();
-					var values = line.Split(',');
-
-					ProductInformation productInformation = new ProductInformation(values[0],
-																				   Convert.ToDecimal(values[1]), Convert.ToDecimal(values[2]), Convert.ToBoolean(values[3]));
-
-					inventory.AddItem(productInformation);
+					while (!reader.EndOfStream)
+					{
+						var line = reader.ReadLine();
+						ProductInformation NewProduct = inventory.FindItem(line);
+						// check if item is in fact an item.
+						receipt.AddReceiptItem(NewProduct);
+					}
 				}
+				receiptPrinter.PrintReciept(receipt);
+		
+		
+			}
+			catch (ApplicationException a) {
+				Console.WriteLine(a.Message);
 			}
 
+		}
+	}
 
-			// Reads in grocery list
-			string TextPath = @"/Users/Bruce/Downloads/GroceryList.txt";
-			using (var fs = File.OpenRead(TextPath))
-			using (var reader = new StreamReader(fs))
-			{
-				while (!reader.EndOfStream)
-				{
-					var line = reader.ReadLine();
-					ProductInformation NewProduct = inventory.FindItem(line);
-					// check if item is in fact an item.
-					receipt.AddReceiptItem(NewProduct);
-				}
-			}
-
+	public class ReceiptPrinter
+	{
+		public void PrintReciept(Receipt receipt)
+		{
 			//Prints the Receipt
 			Console.WriteLine("+++++++++++++++++++++ WELCOME TO BRUCE'S SUPERMARKET +++++++++++++++++++++");
 			string HorizontalBorder = "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++";
@@ -65,6 +67,7 @@ namespace GroceryCo
 			Console.WriteLine(HorizontalBorder);
 			Console.WriteLine(HorizontalBorder);
 		}
+			
 	}
 
 	public class InventoryFactory
@@ -191,19 +194,20 @@ namespace GroceryCo
 			Quantity++;
 		}
 
-		// This will return the quantity of an item multiplied by either the sales price if there is one or the regular price.
+		/// <summary>
+		/// This will return the quantity of an item multiplied by either the sales price if there is one or the regular price.
+		/// </summary>
 		public decimal QuantMultByCorrectPrice()
 		{
 			decimal QuantityTimesItemPrice;
 			decimal QuantityInDec = (decimal)Quantity;
 			if (ProductInformation.getTwoForOne() == true)
 			{
-				decimal DivideQuantBy2 = Decimal.Floor(QuantityInDec / 2);
-				decimal FindQuant2 = QuantityInDec - (DivideQuantBy2 * 2);
+				var DivideQuantBy2 = Decimal.Floor(QuantityInDec / 2);
+				var FindQuant2 = QuantityInDec - (DivideQuantBy2 * 2);
 				decimal AdjustedQuant = DivideQuantBy2 + FindQuant2;
 				QuantityTimesItemPrice = (AdjustedQuant * ProductInformation.GetRegularPrice());
 				return QuantityTimesItemPrice;
-
 			}
 
 			if (ProductInformation.GetSalePrice() == 0)
@@ -252,7 +256,7 @@ namespace GroceryCo
 			{
 				return Items[name];
 			}
-			return null; //CHANGE THIS LATER!!
+			throw new ApplicationException($"Sorry, but {name} does not exist in this store.  Nice try."); 
 		}
 	}
 
@@ -266,6 +270,9 @@ namespace GroceryCo
 
 	public class Receipt : IReceipt
 	{
+		/// <summary>
+		/// A dictionary with the key being the product name, and the value being the receipt items
+		/// </summary>
 		public Dictionary<string, ReceiptItem> ReceiptItems;
 
 		public Receipt()
