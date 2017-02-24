@@ -1,4 +1,15 @@
-# GroceryCo2
+# GroceryCo
+
+How to run:
+
+In the command-prompt window, navigate to the folder that contains the Program.cs file.
+Enter the following command to compile Program.cs.
+csc Program.cs
+If your program has no compilation errors, an executable file that is named Program.exe is created.
+In the command-prompt window, enter the following command to run the program:
+Program
+
+
 
 Input
 
